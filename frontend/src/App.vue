@@ -11,6 +11,8 @@ const messages = ref([]);
 const isConnected = ref(false);
 const drawnCard = ref(null);
 const isDrawing = ref(false);
+const pendingQuestion = ref('');
+const awaitingCard = ref(false);
 
 const majorArcanaImageMap = {
   'The Fool': 'https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg',
@@ -130,11 +132,17 @@ function drawCard() {
   isDrawing.value = true;
   drawnCard.value = null;
 
-  setTimeout(() => {
+  setTimeout(async () => {
     const next = tarotDeck[Math.floor(Math.random() * tarotDeck.length)];
     drawnCard.value = next;
     isDrawing.value = false;
     pushMessage('system', `Bạn vừa bốc lá: ${next.name} (${next.arcana}${next.suit ? ` - ${next.suit}` : ''})`);
+
+    if (awaitingCard.value && pendingQuestion.value) {
+      await sendQuestionWithCard(pendingQuestion.value, next.name);
+      pendingQuestion.value = '';
+      awaitingCard.value = false;
+    }
   }, 900);
 }
 
@@ -154,35 +162,36 @@ async function askViaHttp(payload) {
   pushMessage('reader', data.answer || 'Không có dữ liệu trả về.');
 }
 
-async function ask() {
-  if (!question.value.trim()) return;
-
-  if (!drawnCard.value) {
-    drawCard();
-    pushMessage('system', 'Bạn chưa bốc bài, hệ thống đang tự bốc 1 lá trước khi giải.');
-    await new Promise((resolve) => setTimeout(resolve, 950));
-  }
-
+async function sendQuestionWithCard(rawQuestion, cardName) {
   const payload = {
     name: name.value.trim(),
     spread: spread.value.trim(),
-    drawnCard: drawnCard.value.name,
-    question: question.value.trim()
+    drawnCard: cardName,
+    question: rawQuestion
   };
 
-  pushMessage('you', `${payload.question}\n(Lá bốc: ${payload.drawnCard})`);
-  question.value = '';
+  pushMessage('system', `Đang giải câu hỏi với lá ${cardName}...`);
 
-  try {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(payload));
-    } else {
-      pushMessage('system', 'Mất kết nối realtime, chuyển qua HTTP fallback.');
-      await askViaHttp(payload);
-    }
-  } catch (error) {
-    pushMessage('error', error instanceof Error ? error.message : 'Không thể gửi câu hỏi.');
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(payload));
+    return;
   }
+
+  pushMessage('system', 'Mất kết nối realtime, chuyển qua HTTP fallback.');
+  await askViaHttp(payload);
+}
+
+async function ask() {
+  if (!question.value.trim()) return;
+
+  const q = question.value.trim();
+  pendingQuestion.value = q;
+  awaitingCard.value = true;
+  drawnCard.value = null;
+
+  pushMessage('you', q);
+  question.value = '';
+  pushMessage('system', 'Bây giờ bạn hãy bốc 1 lá để hệ thống bắt đầu giải.');
 }
 
 function handlePageHide() {
@@ -226,16 +235,17 @@ onBeforeUnmount(() => {
         </div>
         <div class="card-face back">🔮 Tarot</div>
       </div>
-      <button @click="drawCard" :disabled="isDrawing">Bốc 1 lá</button>
+      <button @click="drawCard" :disabled="isDrawing">{{ awaitingCard ? "Bốc lá để giải" : "Bốc 1 lá" }}</button>
     </section>
 
     <p v-if="drawnCard" class="card-meta">{{ cardMeta }}</p>
+    <p v-if="awaitingCard" class="card-meta">Đang chờ bạn bốc 1 lá để trả lời câu hỏi vừa gửi.</p>
 
     <div class="form-grid">
       <input v-model="name" placeholder="Tên của bạn" />
       <input v-model="spread" placeholder="Kiểu trải bài" />
       <textarea v-model="question" rows="4" placeholder="Bạn muốn hỏi điều gì?"></textarea>
-      <button @click="ask" :disabled="isDrawing">Gửi câu hỏi</button>
+      <button @click="ask" :disabled="isDrawing || awaitingCard">{{ awaitingCard ? "Đang chờ bốc lá..." : "Gửi câu hỏi" }}</button>
     </div>
 
     <p v-if="typing" class="typing">Tarot reader đang rút bài...</p>
