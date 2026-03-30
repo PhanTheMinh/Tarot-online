@@ -129,3 +129,40 @@ Nếu vẫn gặp lỗi, thử:
 1. Mở app trong cửa sổ Incognito (không extension),
 2. Tắt extension đang inject content script,
 3. Kiểm tra WS trong DevTools > Network > WS.
+
+## 10) Debug lỗi `Không thể xử lý câu hỏi`
+
+Backend hiện đã trả lỗi có cấu trúc để bạn debug nhanh:
+
+### HTTP `/api/chat` error response
+```json
+{
+  "error": "OPENAI_API_KEY không hợp lệ hoặc đã hết hạn.",
+  "errorCode": "OPENAI_AUTH_ERROR",
+  "requestId": "...",
+  "details": "..."
+}
+```
+
+### WebSocket error event
+```json
+{
+  "type": "error",
+  "message": "Vượt giới hạn tốc độ hoặc quota OpenAI.",
+  "errorCode": "OPENAI_RATE_LIMIT",
+  "requestId": "...",
+  "details": "..."
+}
+```
+
+Các mã lỗi chính:
+- `INVALID_JSON`
+- `VALIDATION_ERROR`
+- `OPENAI_AUTH_ERROR`
+- `OPENAI_RATE_LIMIT`
+- `OPENAI_UPSTREAM_ERROR`
+- `INTERNAL_ERROR`
+
+Bạn có thể bật log chi tiết bằng `LOG_LEVEL=debug` trong `backend/.env`.
+Mỗi request sẽ có `requestId` để trace xuyên suốt giữa frontend log và backend log.
+
