@@ -172,5 +172,5 @@ Frontend đã có phần **Bốc 1 lá** với hoạt ảnh lật bài:
 - Deck đầy đủ **78 lá**: 22 lá Ẩn Chính + 56 lá Ẩn Phụ (Cups/Pentacles/Swords/Wands).
 - UI hiển thị **ảnh thật Rider-Waite** cho 22 lá Ẩn Chính.
 - UI cũng hiển thị ảnh cho **56 lá Ẩn Phụ** (SVG local trong `frontend/public/cards/minor`).
-- Khi gửi câu hỏi mà chưa bốc, app tự bốc trước rồi mới gửi.
-- Tên lá bốc được gửi lên backend qua field `drawnCard` để AI giải theo đúng lá.
+- Flow mới: **gửi câu hỏi trước**, sau đó user bốc 1 lá để bắt đầu giải.
+- Tên lá bốc được gửi lên backend qua field `drawnCard` cùng câu hỏi đang chờ.
