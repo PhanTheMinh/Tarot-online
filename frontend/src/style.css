@@ -75,3 +75,8 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   border-radius: 999px;
   background: rgba(14, 16, 33, 0.75);
 }
+
+.deck-hint { margin-top: 0; color: #b6b8ff; font-size: 13px; }
+.card-meta { margin: 10px 0 0; color: #c4d0ff; font-size: 13px; }
+.minor-card { display: grid; gap: 8px; text-align: center; }
+.minor-card span { font-size: 13px; opacity: 0.85; }
