@@ -169,6 +169,8 @@ Mỗi request sẽ có `requestId` để trace xuyên suốt giữa frontend log
 ## 11) UI bốc bài (web)
 
 Frontend đã có phần **Bốc 1 lá** với hoạt ảnh lật bài:
-- Nút `Bốc 1 lá` sẽ random 1 lá Major Arcana.
+- Deck đầy đủ **78 lá**: 22 lá Ẩn Chính + 56 lá Ẩn Phụ (Cups/Pentacles/Swords/Wands).
+- UI hiển thị **ảnh thật Rider-Waite** cho 22 lá Ẩn Chính.
+- Với 56 lá Ẩn Phụ, UI hiển thị tên lá + bộ để tối ưu tốc độ tải.
 - Khi gửi câu hỏi mà chưa bốc, app tự bốc trước rồi mới gửi.
 - Tên lá bốc được gửi lên backend qua field `drawnCard` để AI giải theo đúng lá.
