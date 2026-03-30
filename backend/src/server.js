@@ -239,6 +239,6 @@ wss.on("connection", (ws, req) => {
   });
 });
 
-server.listen(PORT, () => {
-  log("info", `Tarot backend listening on http://localhost:${PORT}`);
+server.listen(PORT, "0.0.0.0", () => {
+  log("info", `Tarot backend listening on http://0.0.0.0:${PORT}`);
 });
