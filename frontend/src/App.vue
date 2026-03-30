@@ -53,7 +53,7 @@ const tarotDeck = [
       name: `${rank} of ${suit}`,
       arcana: 'Minor Arcana',
       suit,
-      image: null
+      image: `/cards/minor/${rank.toLowerCase().replaceAll(' ', '-')}-of-${suit.toLowerCase()}.svg`
     }))
   )
 ];
@@ -219,12 +219,6 @@ onBeforeUnmount(() => {
           <template v-if="!isDrawing && cardImageUrl">
             <img :src="cardImageUrl" :alt="cardLabel" class="card-image" />
             <span class="card-caption">{{ cardLabel }}</span>
-          </template>
-          <template v-else-if="!isDrawing && drawnCard">
-            <div class="minor-card">
-              <strong>{{ cardLabel }}</strong>
-              <span>{{ cardMeta }}</span>
-            </div>
           </template>
           <template v-else>
             {{ isDrawing ? 'Đang bốc...' : cardLabel }}
