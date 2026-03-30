@@ -56,6 +56,12 @@ function connect() {
       return;
     }
 
+    if (payload.type === 'error') {
+      const detail = payload.details ? ` | details: ${JSON.stringify(payload.details)}` : '';
+      pushMessage('error', `[${payload.errorCode || 'UNKNOWN'}][${payload.requestId || '-'}] ${payload.message || 'Lỗi không xác định'}${detail}`);
+      return;
+    }
+
     pushMessage(payload.type || 'system', payload.message || 'Có dữ liệu mới.');
   };
 
@@ -84,11 +90,13 @@ async function askViaHttp(payload) {
     body: JSON.stringify(payload)
   });
 
+  const data = await res.json();
+
   if (!res.ok) {
-    throw new Error('Backend trả lỗi khi gọi HTTP fallback.');
+    const detail = data.details ? ` | details: ${JSON.stringify(data.details)}` : '';
+    throw new Error(`[${data.errorCode || 'HTTP_ERROR'}][${data.requestId || '-'}] ${data.error || 'Backend trả lỗi khi gọi HTTP fallback.'}${detail}`);
   }
 
-  const data = await res.json();
   pushMessage('reader', data.answer || 'Không có dữ liệu trả về.');
 }
 
