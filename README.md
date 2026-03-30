@@ -166,3 +166,9 @@ Các mã lỗi chính:
 Bạn có thể bật log chi tiết bằng `LOG_LEVEL=debug` trong `backend/.env`.
 Mỗi request sẽ có `requestId` để trace xuyên suốt giữa frontend log và backend log.
 
+## 11) UI bốc bài (web)
+
+Frontend đã có phần **Bốc 1 lá** với hoạt ảnh lật bài:
+- Nút `Bốc 1 lá` sẽ random 1 lá Major Arcana.
+- Khi gửi câu hỏi mà chưa bốc, app tự bốc trước rồi mới gửi.
+- Tên lá bốc được gửi lên backend qua field `drawnCard` để AI giải theo đúng lá.

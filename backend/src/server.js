@@ -55,12 +55,14 @@ app.get("/health", (_, res) => {
 const chatSchema = z.object({
   question: z.string().min(1),
   name: z.string().min(1).max(80).optional(),
-  spread: z.string().max(120).optional()
+  spread: z.string().max(120).optional(),
+  drawnCard: z.string().max(120).optional()
 });
 
-function buildTarotPrompt({ name, question, spread }) {
+function buildTarotPrompt({ name, question, spread, drawnCard }) {
   const userName = name ? `Người hỏi: ${name}.` : "Người hỏi: ẩn danh.";
   const spreadLine = spread ? `Kiểu trải bài: ${spread}.` : "Kiểu trải bài: 1 lá định hướng.";
+  const cardLine = drawnCard ? `Lá bài đã bốc: ${drawnCard}.` : "Lá bài đã bốc: chưa có.";
 
   return [
     "Bạn là chuyên gia Tarot thân thiện, nói tiếng Việt dễ hiểu.",
@@ -68,6 +70,7 @@ function buildTarotPrompt({ name, question, spread }) {
     "Nếu câu hỏi liên quan sức khỏe/tài chính/pháp lý, nhắc đây không phải tư vấn chuyên môn.",
     userName,
     spreadLine,
+    cardLine,
     `Câu hỏi: ${question}`,
     "Trả lời theo format:\n1) Năng lượng hiện tại\n2) Góc nhìn Tarot\n3) Hành động gợi ý trong 7 ngày tới"
   ].join("\n");
