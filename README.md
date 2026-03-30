@@ -170,5 +170,6 @@ Mỗi request sẽ có `requestId` để trace xuyên suốt giữa frontend log
 
 Frontend đã có phần **Bốc 1 lá** với hoạt ảnh lật bài:
 - Nút `Bốc 1 lá` sẽ random 1 lá Major Arcana.
+- UI hiển thị **ảnh thật Rider-Waite** của lá vừa bốc để trải nghiệm trực quan hơn.
 - Khi gửi câu hỏi mà chưa bốc, app tự bốc trước rồi mới gửi.
 - Tên lá bốc được gửi lên backend qua field `drawnCard` để AI giải theo đúng lá.
