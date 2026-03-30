@@ -117,3 +117,15 @@ Nếu bạn muốn, bước tiếp theo mình có thể bổ sung:
 - lưu lịch sử phiên Tarot (PostgreSQL + Prisma),
 - đăng nhập Apple/Google,
 - streaming token realtime thay vì đợi full câu trả lời.
+
+## 9) Troubleshooting frontend
+
+### Lỗi: `Unchecked runtime.lastError: ... moved into back/forward cache ... message channel is closed`
+- Thông báo này thường đến từ **Chrome extension** (không phải lỗi business logic của app).
+- Khi tab vào/ra **back-forward cache (bfcache)**, channel của extension có thể bị đóng.
+- Ở bản này, frontend đã thêm `pagehide/pageshow` để đóng/mở lại WebSocket an toàn.
+
+Nếu vẫn gặp lỗi, thử:
+1. Mở app trong cửa sổ Incognito (không extension),
+2. Tắt extension đang inject content script,
+3. Kiểm tra WS trong DevTools > Network > WS.
