@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="840" viewBox="0 0 480 840">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1f2937"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="460" height="820" rx="28" fill="url(#g)" stroke="#475569" stroke-width="6"/>
+  <circle cx="240" cy="210" r="120" fill="#ca8a04" opacity="0.25"/>
+  <text x="240" y="245" text-anchor="middle" font-size="120" fill="#ca8a04" font-family="Inter, Arial">⭑</text>
+  <text x="240" y="420" text-anchor="middle" font-size="48" fill="#e2e8f0" font-family="Inter, Arial">8</text>
+  <text x="240" y="480" text-anchor="middle" font-size="44" fill="#cbd5e1" font-family="Inter, Arial">of Pentacles</text>
+  <text x="240" y="760" text-anchor="middle" font-size="24" fill="#94a3b8" font-family="Inter, Arial">Minor Arcana</text>
+</svg>
