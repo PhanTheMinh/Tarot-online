@@ -5,6 +5,7 @@ import { createServer } from "http";
 import { WebSocketServer } from "ws";
 import OpenAI from "openai";
 import { z } from "zod";
+import { getLatestQuestions, getTopClients, initDb, trackQuestion } from "./db.js";
 
 const PORT = Number(process.env.PORT || 8080);
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4.1-mini";
@@ -50,6 +51,36 @@ app.use((req, res, next) => {
 
 app.get("/health", (_, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
+});
+
+
+function getClientInfo(req) {
+  const forwardedFor = req.headers['x-forwarded-for'];
+  const clientIp = Array.isArray(forwardedFor)
+    ? forwardedFor[0]
+    : (forwardedFor || '').toString().split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+
+  const clientAddress = req.headers['x-real-ip'] || req.socket?.remoteAddress || req.headers.host || 'unknown';
+  return { clientIp, clientAddress };
+}
+
+
+app.get('/api/tracking/questions', async (req, res) => {
+  try {
+    const limit = Math.min(Number(req.query.limit || 50), 200);
+    res.json({ items: await getLatestQuestions(limit) });
+  } catch (error) {
+    res.status(500).json({ error: 'Không lấy được danh sách câu hỏi tracking.' });
+  }
+});
+
+app.get('/api/tracking/clients', async (req, res) => {
+  try {
+    const limit = Math.min(Number(req.query.limit || 20), 200);
+    res.json({ items: await getTopClients(limit) });
+  } catch (error) {
+    res.status(500).json({ error: 'Không lấy được thống kê client.' });
+  }
 });
 
 const chatSchema = z.object({
@@ -147,6 +178,16 @@ app.post("/api/chat", async (req, res) => {
 
   try {
     const parsed = chatSchema.parse(req.body);
+    const { clientIp, clientAddress } = getClientInfo(req);
+    await trackQuestion({
+      requestId,
+      name: parsed.name,
+      question: parsed.question,
+      drawnCard: parsed.drawnCard,
+      clientIp,
+      clientAddress
+    });
+
     const answer = await askTarot(parsed);
     return res.json({ answer, requestId });
   } catch (error) {
@@ -191,6 +232,16 @@ wss.on("connection", (ws, req) => {
       }
 
       const parsed = chatSchema.parse(body);
+      const { clientIp, clientAddress } = getClientInfo(req);
+      await trackQuestion({
+        requestId,
+        name: parsed.name,
+        question: parsed.question,
+        drawnCard: parsed.drawnCard,
+        clientIp,
+        clientAddress
+      });
+
       ws.send(JSON.stringify({ type: "typing", value: true, requestId }));
       const answer = await askTarot(parsed);
       ws.send(JSON.stringify({ type: "answer", data: answer, requestId }));
@@ -239,6 +290,16 @@ wss.on("connection", (ws, req) => {
   });
 });
 
-server.listen(PORT, "0.0.0.0", () => {
-  log("info", `Tarot backend listening on http://0.0.0.0:${PORT}`);
-});
+async function startServer() {
+  try {
+    await initDb();
+    server.listen(PORT, () => {
+      log("info", `Tarot backend listening on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    log("error", "Cannot initialize MySQL database", { error: error?.message, stack: error?.stack });
+    process.exit(1);
+  }
+}
+
+startServer();

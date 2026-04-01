@@ -174,3 +174,39 @@ Frontend đã có phần **Bốc 1 lá** với hoạt ảnh lật bài:
 - UI cũng hiển thị ảnh cho **56 lá Ẩn Phụ** (SVG local trong `frontend/public/cards/minor`).
 - Flow mới: **gửi câu hỏi trước**, sau đó user bốc 1 lá để bắt đầu giải.
 - Tên lá bốc được gửi lên backend qua field `drawnCard` cùng câu hỏi đang chờ.
+
+## 12) Tracking người dùng và số câu hỏi
+
+Backend đã thêm **MySQL** để tracking:
+
+### Bảng `user_questions`
+Lưu lịch sử từng câu hỏi:
+- `name`
+- `question`
+- `drawn_card`
+- `client_ip`
+- `client_address`
+- `request_id`
+- `created_at`
+
+### Bảng `client_stats`
+Lưu thống kê theo client:
+- `client_ip`
+- `client_address`
+- `question_count`
+- `last_seen_at`
+
+### API xem tracking
+- `GET /api/tracking/questions?limit=50`
+- `GET /api/tracking/clients?limit=20`
+
+Các bảng được tạo tự động khi backend start (qua `initDb()`).
+
+
+
+Biến môi trường MySQL cần cấu hình trong `backend/.env`:
+- `MYSQL_HOST`
+- `MYSQL_PORT`
+- `MYSQL_USER`
+- `MYSQL_PASSWORD`
+- `MYSQL_DATABASE`
